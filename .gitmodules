@@ -1,0 +1,3 @@
+[submodule "api_forecasting"]
+    path = api_forecasting
+    url = https://github.com/niezk/api_forecasting.git
