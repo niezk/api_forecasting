@@ -10,20 +10,12 @@ enhanced_model = create_enhanced_model()
 print("model trained!")
 app = Flask(__name__)
 CORS(app)
-# docs_data = get_firestore_docs()
 docs_data = filtered_data
-def get_data_list():
-    """Get fresh data from Firestore"""
-    try:
-        return get_firestore_docs()
-    except Exception as e:
-        print(f"Error loading data: {e}")
-        return []
 
 @app.route("/")
 def home_route():
     start_time = time.time()
-    
+    print("/ executed")
     response_data = {
         "status": 200,
         "message": "Forecasting API Basic ready to launch!"
@@ -258,10 +250,11 @@ def method_not_allowed(error):
 
 @app.errorhandler(500)
 def internal_error(error):
+    print(error)
     return jsonify({
         "status": 500,
         "message": "Internal server error"
     }), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8080)
