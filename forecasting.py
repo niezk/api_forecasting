@@ -6,7 +6,6 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
-
 from data_offline import filtered_data
 
 class EnhancedProphetModel:

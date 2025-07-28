@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from forecasting import model_predict, create_enhanced_model
 import time
-
+from data_offline import filtered_data 
 
 
 print("starting model...")
