@@ -1,1 +1,4 @@
-ServiceCredentials.json
+.env
+ServiceAccount.json
+firebase_config.py
+data_loader.py

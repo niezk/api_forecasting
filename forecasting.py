@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 
-from data_loader import get_firestore_docs
 from data_offline import filtered_data
 
 class EnhancedProphetModel:
@@ -88,10 +87,7 @@ class EnhancedProphetModel:
         
         # Add custom regressors for daily patterns
         daily_df = self._add_custom_features(daily_df)
-        
-        print(f"Daily data prepared: {len(daily_df)} days from {daily_df['ds'].min().date()} to {daily_df['ds'].max().date()}")
-        print(f"Daily consumption range: {daily_df['y'].min():.2f} to {daily_df['y'].max():.2f}")
-        print(f"Average daily consumption: {daily_df['y'].mean():.2f}")
+
         
         return daily_df
     
@@ -214,28 +210,6 @@ class EnhancedProphetModel:
             print(f"Error in prediction: {e}")
             return None
     
-    def cross_validate_model(self, initial='60 days', period='14 days', horizon='7 days'):
-        """
-        Perform time series cross-validation for daily forecasting
-        """
-        from prophet.diagnostics import cross_validation, performance_metrics
-        
-        if not self.is_fitted:
-            raise ValueError("Model must be fitted before cross-validation")
-        
-        try:
-            df_cv = cross_validation(self.model, initial=initial, period=period, horizon=horizon)
-            df_performance = performance_metrics(df_cv)
-            
-            print("Cross-validation performance (daily forecasting):")
-            print(df_performance[['horizon', 'mape', 'rmse', 'mae']].round(4))
-            
-            return df_cv, df_performance
-            
-        except Exception as e:
-            print(f"Error in cross-validation: {e}")
-            return None, None
-    
     def plot_forecast(self, forecast, periods):
         """
         Plot the daily forecast with components
@@ -316,16 +290,9 @@ def model_predict(periods, enhanced_model=None):
     forecast = enhanced_model.predict(periods)
     
     if forecast is not None:
-        # Display key forecast metrics
-        print(f"\nDaily Forecast Summary for next {periods} days:")
-        print(f"Predicted mean daily consumption: {forecast['yhat'].mean():.2f}")
-        print(f"Prediction range: {forecast['yhat'].min():.2f} to {forecast['yhat'].max():.2f}")
-        print(f"Confidence interval width: {(forecast['yhat_upper'] - forecast['yhat_lower']).mean():.2f}")
-        
         # Show trend direction
         trend_change = forecast['yhat'].iloc[-1] - forecast['yhat'].iloc[0]
         trend_direction = "increasing" if trend_change > 0 else "decreasing"
-        print(f"Overall trend: {trend_direction} ({trend_change:+.2f})")
         
         # Show weekday vs weekend predictions
         forecast_with_weekday = forecast.copy()
@@ -335,10 +302,7 @@ def model_predict(periods, enhanced_model=None):
         weekday_avg = forecast_with_weekday[~forecast_with_weekday['is_weekend']]['yhat'].mean()
         weekend_avg = forecast_with_weekday[forecast_with_weekday['is_weekend']]['yhat'].mean()
         
-        print(f"Average weekday consumption: {weekday_avg:.2f}")
-        print(f"Average weekend consumption: {weekend_avg:.2f}")
-        print(f"Weekend vs Weekday difference: {weekend_avg - weekday_avg:+.2f}")
-    
+
     return forecast
 
 # Initialize the enhanced model

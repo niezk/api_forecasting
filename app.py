@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
-from data_loader import get_firestore_docs
 from flask_cors import CORS
-from forecasting import model_predict
+from forecasting import model_predict, create_enhanced_model
 import time
-from firebase_config import firebase_db
-from data_offline import filtered_data
+
+
+
+print("starting model...")
+enhanced_model = create_enhanced_model()
+print("model trained!")
 app = Flask(__name__)
 CORS(app)
 # docs_data = get_firestore_docs()
@@ -48,7 +51,7 @@ def get_forecast_data():
             response_data["duration_ms"] = round((end_time - start_time) * 1000, 2)
             return jsonify(response_data), 400
         
-        forecast = model_predict(periods)
+        forecast = model_predict(periods, enhanced_model)
         
         if forecast is not None:
             # Convert forecast to a serializable format
@@ -159,9 +162,6 @@ def get_real_data():
     response_data["duration_ms"] = round((end_time - start_time) * 1000, 2)
     
     return jsonify(response_data), response_data.get("status", 500)
-
-@app.route("/api/data/update", methods=["POST"])
-def add_data():
     start_time = time.time()
     
     try:
